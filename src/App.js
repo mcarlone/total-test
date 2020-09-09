@@ -5,18 +5,29 @@ import logo from './logo.svg';
 import './App.css';
 
 // crocks
-import prop from 'crocks/Maybe/prop'; // prop returns a Maybe
+import Maybe from "crocks/Maybe";
+// import prop from 'crocks/Maybe/prop'; // prop returns a Maybe
 
 // helpers
 import liftA2 from "crocks/helpers/liftA2";
+// import safe from "crocks/Maybe/safe";
+// import compose from "crocks/helpers/compose";
 
+// predicates
+import { isString, isEmpty } from 'crocks/predicates'
 
+// logic
+import not from 'crocks/logic/not'
+import and from 'crocks/logic/and';
+import ifElse from 'crocks/logic/ifElse';
 
-// const { Just, Nothing } = Maybe;
+// pointfree
+// import chain from 'crocks/pointfree/chain';
 
-// const an = All(Nothing());
-// const aj = All(Just(1));
-// console.log( an.concat(aj).valueOf() );
+const { Just, Nothing } = Maybe;
+
+// ensureValidString :: s -> Maybe s
+const ensureValidString = ifElse(and(not(isEmpty), isString), Just, Nothing);
 
 
 const FormFun = props => {
@@ -26,19 +37,16 @@ const FormFun = props => {
   const handleChange = (event) => {
     const { target } = event;
     const { name, value } = target;
-    // event.persist();
+    event.persist();
     setValues({ ...values, [name]: value });
   };
 
-  const maybeFirstName = prop('firstName', values);
-  const maybeLastName = prop('lastName', values);
+  const maybeFirstName = ensureValidString(values.firstName);
+  const maybeLastName = ensureValidString(values.lastName);
 
-  const fullName = firstName => lastName => {
-    console.log('fullname call:', firstName, lastName)
+  const fullName = liftA2(firstName => lastName => {
     return `${firstName} ${lastName}`;
-  };
-
-  console.log('hey', liftA2(fullName)(maybeFirstName)(maybeLastName));
+  });
 
   return (
     <form>
@@ -51,7 +59,7 @@ const FormFun = props => {
         { <input onChange={handleChange} value={maybeLastName.option("")} type="text" name="lastName" /> }
       </label>
       <div>
-        Fullname: { fullName(maybeFirstName.option(""), maybeLastName.option("")) }
+        Fullname: { fullName(maybeFirstName)(maybeLastName).option("(please add first AND last names)") }
       </div>
     </form>
   );
