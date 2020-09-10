@@ -11,7 +11,8 @@ import Maybe from "crocks/Maybe";
 // helpers
 import liftA2 from "crocks/helpers/liftA2";
 // import safe from "crocks/Maybe/safe";
-// import compose from "crocks/helpers/compose";
+import compose from "crocks/helpers/compose";
+import fanout from "crocks/Pair/fanout";
 
 // predicates
 import { isString, isEmpty } from 'crocks/predicates'
@@ -22,9 +23,37 @@ import and from 'crocks/logic/and';
 import ifElse from 'crocks/logic/ifElse';
 
 // pointfree
-// import chain from 'crocks/pointfree/chain';
+import merge from 'crocks/pointfree/merge'
+
 
 const { Just, Nothing } = Maybe;
+
+
+// Pair/fanout/merge fun
+const upAndDown = fanout(a => Just(a + 1), a => Just(a - 1));
+const upAndDownPair = upAndDown(5);
+console.log('upAndDown', upAndDownPair.inspect()) // upAndDown(2) === Pair(3, 1)
+
+// const report = (f, s) => `Hey its ${f} and ${s}`;
+const add = f => s => f + s;
+console.log('double p', merge(liftA2(add), upAndDownPair).inspect());
+
+// ...same, but using composition
+const flow = compose(
+  merge(liftA2(add)),
+  fanout(a => Just(a + 1), a => Just(a - 1))
+);
+
+console.log('flow', flow(5).inspect())
+// END Pair/fanout/merge fun
+
+
+
+
+
+
+
+
 
 // ensureValidString :: s -> Maybe s
 const ensureValidString = ifElse(and(not(isEmpty), isString), Just, Nothing);
