@@ -21,6 +21,10 @@ import not from 'crocks/logic/not'
 import and from 'crocks/logic/and';
 import ifElse from 'crocks/logic/ifElse';
 
+
+
+import EitherFormFun from './fun/eitherFormfun';
+
 // pointfree
 // import chain from 'crocks/pointfree/chain';
 
@@ -78,6 +82,7 @@ const FormFun = props => {
 function App() {
   return (
     <div className="App">
+      <EitherFormFun/>
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
