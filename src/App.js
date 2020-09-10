@@ -29,6 +29,17 @@ const { Just, Nothing } = Maybe;
 // ensureValidString :: s -> Maybe s
 const ensureValidString = ifElse(and(not(isEmpty), isString), Just, Nothing);
 
+// fullName :: Maybe String -> Maybe String -> Maybe String
+// MC note: liftA2 lifts a function to take monads going in, unwraps them, 
+//          applys the function, and returns the result in the same monad 
+//          type. If Nothing is input, then the func returns a Nothing instence.
+const fullName = liftA2(firstName => lastName => {
+  return `${firstName} ${lastName}`;
+});
+
+const FullNamePlaceholder = () => {
+  return <strong>Please enter first and last names</strong>;
+}
 
 const FormFun = props => {
 
@@ -44,10 +55,6 @@ const FormFun = props => {
   const maybeFirstName = ensureValidString(values.firstName);
   const maybeLastName = ensureValidString(values.lastName);
 
-  const fullName = liftA2(firstName => lastName => {
-    return `${firstName} ${lastName}`;
-  });
-
   return (
     <form>
       <label>
@@ -59,7 +66,7 @@ const FormFun = props => {
         { <input onChange={handleChange} value={maybeLastName.option("")} type="text" name="lastName" /> }
       </label>
       <div>
-        Fullname: { fullName(maybeFirstName)(maybeLastName).option("(please add first AND last names)") }
+        Fullname: { fullName(maybeFirstName)(maybeLastName).option(<FullNamePlaceholder/>) }
       </div>
     </form>
   );
