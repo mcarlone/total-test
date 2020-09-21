@@ -2,7 +2,8 @@ import Async from 'crocks/Async'
 
 import getPropOr from 'crocks/helpers/getPropOr'
 
-import { compose, maybeToAsync, chain, safe, isObject } from 'crocks';
+import { compose, maybeToAsync, chain, safe, isObject, hasProp } from 'crocks';
+// window.hasProp = hasProp
 
 const API_BASE = "https://api-v3.mbta.com";
 const API_KEY = "4de50aaa48a84beb81cde31a2bb86282"; // https://api-v3.mbta.com/portal
@@ -16,6 +17,7 @@ function FetchExeption(value) {
     };
 }
 
+// _fetchPromise :: String -> Promise
 const _fetchPromise = async (url) => {
     // check out https://github.com/whatwg/fetch/issues/18#issuecomment-605629519 to improve
     
@@ -27,31 +29,27 @@ const _fetchPromise = async (url) => {
         });
 };
 
-const _error = value => new FetchExeption(value);
+// _linesURL :: URLSearchParams -> string
+const _linesURL = params => `${API_BASE}/lines?api_key=${API_KEY}&${params}`;
 
-const _urlParams = params => {
-    return new URLSearchParams(params);
-};
+// _urlParams :: Object -> URLSearchParams
+const _urlParams = params => new URLSearchParams(params);
+
+const _error = value => new FetchExeption(value);
 
 const Mbta = () => {
 
-    // const _linesPromise = (options) => {
-    //     const params = _urlParams(options);
-    //     const url = `${API_BASE}/lines?api_key=${API_KEY}&${params}`;
-    //     return _fetchPromise(url);    
-    // };
-
     // _linesPromise:: Object -> Promise
     const _linesPromise = compose(
-        _fetchPromise,
-        params => `${API_BASE}/lines?api_key=${API_KEY}&${params}`,
-        _urlParams
+        _fetchPromise, // String -> Promise
+        _linesURL, // URLSearchParams -> String
+        _urlParams // Object -> URLSearchParams
     );
 
     const lines = compose(
-        chain(Async.fromPromise(_linesPromise)),
-        maybeToAsync('getLines expects an options object'),
-        safe(isObject)
+        chain(Async.fromPromise(_linesPromise)), // Async object -> Promise lines req
+        maybeToAsync('getLines expects an options object'), // Maybe object -> Async object
+        safe(isObject) // object -> Maybe object
     ); 
 
     return {
