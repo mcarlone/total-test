@@ -5,10 +5,8 @@ import { useState } from "react";
 // crocks
 import Either from "crocks/Either";
 import Pair from "crocks/Pair";
-import List from "crocks/List";
 
 // helpers
-import liftA2 from "crocks/helpers/liftA2";
 import compose from "crocks/helpers/compose";
 
 // predicates
@@ -60,15 +58,6 @@ const name = compose(
 
 const eitherString = ifElse(and(not(isEmpty), isString), Right, Left);
 
-const fullName = liftA2(firstName => lastName => {
-    return `${firstName} ${lastName}`;
-});
-
-const FullNamePlaceholder = () => {
-    return <strong>[E] Please enter first and last names</strong>;
-}
-
-const testChain = (v) => Right(v + '!');
 console.log('eitherString', Right('matt').chain(eitherString).inspect())
 
 const EitherFormFun = props => {

@@ -1,38 +1,27 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useState } from "react";
 
-import logo from './logo.svg';
 import './App.css';
 
 // crocks
-import Maybe from "crocks/Maybe";
-// import prop from 'crocks/Maybe/prop'; // prop returns a Maybe
+
 
 // helpers
-import liftA2 from "crocks/helpers/liftA2";
+
 // import safe from "crocks/Maybe/safe";
-import compose from "crocks/helpers/compose";
-import fanout from "crocks/Pair/fanout";
+
 
 // predicates
-import { isString, isEmpty } from 'crocks/predicates'
+
 
 // logic
-import not from 'crocks/logic/not'
-import and from 'crocks/logic/and';
-import ifElse from 'crocks/logic/ifElse';
 
-
-
-import EitherFormFun from './fun/eitherFormfun';
 
 // pointfree
-import merge from 'crocks/pointfree/merge'
 
-import Mbta from './api/mbta';
 
 const MbtaLines = () => {
-  const [lines, setlines] = useState({data:[]});
+  const [lines] = useState({data:[]});
 
   // useEffect(() => {
   //   Mbta().lines().then(json => setlines(json));
