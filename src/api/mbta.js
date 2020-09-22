@@ -2,7 +2,7 @@ import Async from 'crocks/Async'
 
 import getPropOr from 'crocks/helpers/getPropOr'
 
-import { compose, maybeToAsync, chain, safe, isObject, hasProp } from 'crocks';
+import { compose, maybeToAsync, chain, safe, isObject } from 'crocks';
 // window.hasProp = hasProp
 
 const API_BASE = "https://api-v3.mbta.com";
@@ -20,20 +20,15 @@ function FetchExeption(value) {
 // _fetchPromise :: String -> Promise
 const _fetchPromise = async (url) => {
     // check out https://github.com/whatwg/fetch/issues/18#issuecomment-605629519 to improve
-    
-    return await fetch(url)
-        .then(res => res.ok ? res : res.text().then(JSON.parse).then(e => {throw _error(e)}))
-        .then(res => res.json())
-        .catch(error => {
-            throw error;
-        });
+    const isOk = response => response.ok ? response.json() : response.text().then(JSON.parse).then(e => Promise.reject(e));
+    return await fetch(url).then(isOk)
 };
 
-// _linesURL :: URLSearchParams -> string
-const _linesURL = params => `${API_BASE}/lines?api_key=${API_KEY}&${params}`;
+// _formatLinesURL :: URLSearchParams -> string
+const _formatLinesURL = params => `${API_BASE}/lines?api_key=${API_KEY}&${params}`;
 
-// _urlParams :: Object -> URLSearchParams
-const _urlParams = params => new URLSearchParams(params);
+// _formatUrlParams  :: Object -> URLSearchParams
+const _formatUrlParams = params => new URLSearchParams(params);
 
 const _error = value => new FetchExeption(value);
 
@@ -42,8 +37,8 @@ const Mbta = () => {
     // _linesPromise:: Object -> Promise
     const _linesPromise = compose(
         _fetchPromise, // String -> Promise
-        _linesURL, // URLSearchParams -> String
-        _urlParams // Object -> URLSearchParams
+        _formatLinesURL, // URLSearchParams -> String
+        _formatUrlParams // Object -> URLSearchParams
     );
 
     const lines = compose(
