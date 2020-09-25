@@ -48,3 +48,13 @@ export const getLines = compose(
     maybeToAsync('getLines expects an options object'),
     safe(isObject)
 ); 
+
+/* NOTES
+const getError = err => getPropOr(err, 'value', err);
+const getData = res => res.data;
+
+const lines1 = Mbta().lines({sort:'-long_name'}).bimap(getError, getData);;
+const lines2 = Mbta().lines({sort:'-long_name'}).bimap(getError, getData);;
+
+Async.all([lines1, lines2]).fork(trace('rej! all'), trace('res! all'));
+*/
