@@ -1,47 +1,33 @@
-import React from 'react';
-import { useState } from "react";
-
+import React, { useEffect, useState } from 'react';
 import './App.css';
+import { getLines } from './api/mbta/lines';
+import { compose, Maybe } from 'crocks';
 
-import Mbta from './api/mbta';
+const { Just } = Maybe;
 
-// crocks
-
-
-// helpers
-
-// import safe from "crocks/Maybe/safe";
-
-
-// predicates
-
-
-// logic
-
-
-// pointfree
-
+const initialLinesState = [];
 
 const MbtaLines = () => {
-  const [lines] = useState({data:[]});
+  const [lines, setlines] = useState(initialLinesState);
 
-  // useEffect(() => {
-  //   Mbta().lines().then(json => setlines(json));
-  // }, []);
+  useEffect(() => {
+    const reportError = err => console.error('Error fetchiing Lines', err);
+    const updateLines = compose(setlines, res => res.data);
+    getLines({sort:'long_name'}).fork(reportError, updateLines)
+  }, []);
 
-  return (
-    <div>{ lines.data.map(MbtaLine) }</div>
-  );
+  const debugLinesRender = ls => ls.map(MbtaLine);
+
+  return <>{ Just(lines).map(debugLinesRender).option('ah shit') }</>;
 };
 
 const MbtaLine = (lineData) => {
-
   const style = {
     color: `#${lineData.attributes.color}`
   };
   return (
     <div key={lineData.id}>
-      Line name: <span style={style}>{lineData.attributes.long_name}</span>
+      <span style={style}>{lineData.attributes.long_name}</span>
     </div>
   )
 };
